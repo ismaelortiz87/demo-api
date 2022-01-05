@@ -1,13 +1,14 @@
 {
   "name": "gbh-demo-api",
   "version": "1.0.0",
-  "description": "A demo API using nodejs!",
+  "description": "A demo API using ExpressJS!",
   "main": "index.js",
+  "private": true,
+  "author": "GBH",
+  "type": "module",
   "scripts": {
     "start": "node app.js"
   },
-  "author": "Soluciones GBH, Inc.",
-  "license": "MIT",
   "dependencies": {
     "cookie-parser": "^1.4.4",
     "cors": "^2.8.5",
