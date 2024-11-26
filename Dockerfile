@@ -17,4 +17,4 @@ RUN npm install -g pm2
 EXPOSE 3000
 
 # Use PM2 to start the application
-CMD ["pm2-runtime", "start", "app.js", "--name", "demo-api"]
+CMD ["pm2-runtime", "start", "app.js", "--name", "api"]

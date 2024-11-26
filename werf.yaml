@@ -1,8 +1,8 @@
-project: demo-api
+project: api
 configVersion: 1
 build:
   platform:
   - linux/amd64
 ---
-image: demo-api
+image: api
 dockerfile: Dockerfile

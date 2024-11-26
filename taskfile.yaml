@@ -14,7 +14,7 @@ dotenv:
   - .env
 
 env:
-  PROJECT: 'demo-api'
+  PROJECT: 'api'
   AKS_RG: 'gbhdemo'
   AKS_CLUSTER_NAME: 'gbhdemo'
   AZ_SUBSCRIPTION_ID: 'cf1ce858-81de-4f63-95a9-1b2a0dc691fc'

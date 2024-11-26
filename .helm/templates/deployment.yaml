@@ -22,7 +22,7 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: {{ tpl $.Values.projectName $ }}
-          image: {{ $.Values.werf.image }}
+          image: {{ $.Values.werf.image.api }}
           imagePullPolicy: Always
           resources:
             requests:
