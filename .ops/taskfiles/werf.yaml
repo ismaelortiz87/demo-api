@@ -9,7 +9,6 @@ tasks:
     cmds:
       - werf {{.COMMAND}}
         --env {{.ENVIRONMENT}}
-        --dev
     requires:
       vars: [ENVIRONMENT, COMMAND]
 
@@ -19,13 +18,12 @@ tasks:
         --env {{.ENVIRONMENT}}
         --release {{.ENVIRONMENT}}
         --repo {{.ACR_URL}}/{{.ENVIRONMENT}}/{{.PROJECT}}
-        --dev
     requires:
       vars: [ENVIRONMENT, PROJECT, COMMAND]
 
   build:
     cmds:
-      - werf build --repo {{.ACR_URL}}/{{.ENVIRONMENT}}/{{.PROJECT}} --dev
+      - werf build --repo {{.ACR_URL}}/{{.ENVIRONMENT}}/{{.PROJECT}}
     requires:
       vars: [ACR_URL, ENVIRONMENT, PROJECT]
 
@@ -34,7 +32,6 @@ tasks:
       - werf dismiss
         --namespace {{.PROJECT}}-{{.ENVIRONMENT}}
         --release {{.PROJECT}}-{{.ENVIRONMENT}}
-        --dev
     requires:
       vars: [ENVIRONMENT, PROJECT]
 
@@ -43,6 +40,5 @@ tasks:
       - werf export
         --repo {{.ACR_URL}}/{{.ENVIRONMENT}}/{{.PROJECT}}
         --tag {{.ACR_URL}}/{{.ENVIRONMENT}}/{{.PROJECT}}:{{.ENVIRONMENT}}
-        --dev
     requires:
       vars: [ACR_URL, ENVIRONMENT, PROJECT]
