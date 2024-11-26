@@ -1,0 +1,11 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ tpl $.Values.projectName $ }}
+spec:
+  ports:
+    - port: {{ $.Values.port }}
+      targetPort: {{ $.Values.port }}
+      protocol: TCP
+  selector:
+    app: {{ tpl $.Values.projectName $ }}

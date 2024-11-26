@@ -1,0 +1,16 @@
+---
+# General
+projectName: '{{ $.Values.werf.name }}'
+domain: 'gbh.tech'
+
+# App
+port: 3001
+healthEndpoint: '/'
+
+resources:
+  requests:
+    memory: 100m
+    cpu: 100m
+  limits:
+    memory: 200m
+    cpu: 200m

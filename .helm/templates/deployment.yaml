@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ tpl $.Values.projectName $ }}
+  labels:
+    app: {{ tpl $.Values.projectName $ }}
+spec:
+  revisionHistoryLimit: 1
+  replicas: {{ $.Values.replicas }}
+  selector:
+    matchLabels:
+      app: {{ tpl $.Values.projectName $ }}
+  template:
+    metadata:
+      annotations:
+        commit: {{ $.Values.werf.commit.hash }}
+        date: {{ now }}
+      labels:
+        app: {{ tpl $.Values.projectName $ }}
+    spec:
+      serviceAccountName: default
+      automountServiceAccountToken: false
+      containers:
+        - name: {{ tpl $.Values.projectName $ }}
+          image: {{ $.Values.werf.image }}
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: {{ $.Values.resources.requests.memory }}
+              cpu: {{ $.Values.resources.requests.cpu }}
+            limits:
+              memory: {{ $.Values.resources.limits.memory }}
+              cpu: {{ $.Values.resources.limits.cpu }}
+          envFrom:
+            - configMapRef:
+                name: {{ tpl $.Values.projectName $ }}

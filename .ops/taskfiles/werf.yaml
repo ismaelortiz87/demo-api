@@ -1,0 +1,48 @@
+version: '3'
+
+vars:
+  ENVIRONMENT: '{{default .CLI_ARGS .ENVIRONMENT}}'
+
+tasks:
+# Tasks: Werf commands
+  command:
+    cmds:
+      - werf {{.COMMAND}}
+        --env {{.ENVIRONMENT}}
+        --dev
+    requires:
+      vars: [ENVIRONMENT, COMMAND]
+
+  command-with-repo:
+    cmds:
+      - werf {{.COMMAND}}
+        --env {{.ENVIRONMENT}}
+        --release {{.ENVIRONMENT}}
+        --repo {{.ACR_URL}}/{{.ENVIRONMENT}}/{{.PROJECT}}
+        --dev
+    requires:
+      vars: [ENVIRONMENT, PROJECT, COMMAND]
+
+  build:
+    cmds:
+      - werf build --repo {{.ACR_URL}}/{{.ENVIRONMENT}}/{{.PROJECT}} --dev
+    requires:
+      vars: [ACR_URL, ENVIRONMENT, PROJECT]
+
+  dismiss:
+    cmds:
+      - werf dismiss
+        --namespace {{.PROJECT}}-{{.ENVIRONMENT}}
+        --release {{.PROJECT}}-{{.ENVIRONMENT}}
+        --dev
+    requires:
+      vars: [ENVIRONMENT, PROJECT]
+
+  export:
+    cmds:
+      - werf export
+        --repo {{.ACR_URL}}/{{.ENVIRONMENT}}/{{.PROJECT}}
+        --tag {{.ACR_URL}}/{{.ENVIRONMENT}}/{{.PROJECT}}:{{.ENVIRONMENT}}
+        --dev
+    requires:
+      vars: [ACR_URL, ENVIRONMENT, PROJECT]

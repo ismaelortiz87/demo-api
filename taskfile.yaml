@@ -1,0 +1,129 @@
+version: '3'
+
+includes:
+  log:
+    taskfile: .ops/taskfiles/log.yaml
+  werf:
+    taskfile: .ops/taskfiles/werf.yaml
+    internal: true
+  k8s:
+    taskfile: .ops/taskfiles/k8s.yaml
+    internal: true
+
+dotenv:
+  - .env
+
+env:
+  PROJECT: 'demo-api'
+  AKS_RG: 'gbhdemo'
+  AKS_CLUSTER_NAME: 'gbhdemo'
+  AZ_SUBSCRIPTION_ID: 'cf1ce858-81de-4f63-95a9-1b2a0dc691fc'
+  ACR_URL: 'gbhdemo.azurecr.io'
+
+tasks:
+  copy-env:
+    cmds:
+      - cp .env.example .env
+    status:
+      - test -f .env
+
+# Tasks: Werf
+  deploy:
+    desc: Runs the deployment workflow with 'werf converge'.
+    vars:
+      ENVIRONMENT: production
+    cmds:
+      - task: acr-login
+      - task: kubeconfig
+      - task: werf:command-with-repo
+        vars: {
+          COMMAND: 'converge',
+          ENVIRONMENT: '{{.ENVIRONMENT}}',
+          PROJECT: '{{.PROJECT}}'
+        }
+
+  plan:
+    desc: Runs an speculative deployment test with 'werf plan'.
+    vars:
+      ENVIRONMENT: production
+    cmds:
+      - task: acr-login
+      - task: kubeconfig
+      - task: werf:command-with-repo
+        vars: {
+          COMMAND: 'plan',
+          ENVIRONMENT: '{{.ENVIRONMENT}}',
+          PROJECT: '{{.PROJECT}}'
+        }
+    requires:
+      vars: [ENVIRONMENT]
+
+  render:
+    desc: Renders the application chart with 'werf render'.
+    vars:
+      ENVIRONMENT: production
+    cmds:
+      - task: werf:command
+        vars: {
+          COMMAND: 'render',
+          ENVIRONMENT: '{{.ENVIRONMENT}}',
+          PROJECT: '{{.PROJECT}}'
+        }
+
+  destroy:
+    desc: Removes deployed resources with 'werf dismiss'.
+    vars:
+      ENVIRONMENT: production
+    cmds:
+      - task: werf:dismiss
+        vars: {
+          PROJECT: '{{.PROJECT}}',
+          ENVIRONMENT: '{{.ENVIRONMENT}}'
+        }
+
+  image-build:
+    desc: Runs the image build with 'werf build'.
+    vars:
+      ENVIRONMENT: production
+    cmds:
+      - task: acr-login
+      - task: werf:build
+        vars: {
+          ENVIRONMENT: '{{.ENVIRONMENT}}'
+        }
+
+  image-push:
+    desc: Runs the image push/export command with 'werf export'.
+    vars:
+      ENVIRONMENT: production
+    cmds:
+      - task: werf:export
+        vars: {
+          ENVIRONMENT: '{{.ENVIRONMENT}}'
+        }
+
+# Tasks: Azure
+  az-login:
+    desc: Authenticate against the target subscription ID using Azure CLi
+    cmds:
+      # - az login
+      - az account set --subscription={{.AZ_SUBSCRIPTION_ID}}
+    status:
+      - (az account show | jq '.id') | grep -q {{.AZ_SUBSCRIPTION_ID}}
+
+  acr-login:
+    desc: Authenticate to the remote Azure ACR repository using the Azure CLI
+    cmds:
+      - task: az-login
+      - az acr login --name gbhdemo
+
+# Tasks: Kubernetes
+  kubeconfig:
+    desc: Configures the local kubeconfig with the Azure AKS cluster credentials
+    cmds:
+      - az aks get-credentials
+        --resource-group {{.AKS_RG}}
+        --name {{.AKS_CLUSTER_NAME}}
+        --admin
+    status:
+      - kubectl config current-context | grep -q {{.AKS_CLUSTER_NAME}}-admin
