@@ -1,6 +1,3 @@
-# .github/workflows/ci-cd.yml
-# Place this file in the demo-api repository
-
 name: Demo API CI/CD
 
 on:
