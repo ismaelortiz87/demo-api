@@ -92,21 +92,24 @@ jobs:
 
     - name: Deploy API with Helm
       run: |
-        # Extract image information
-        IMAGE_TAG="${{ needs.build.outputs.image-tag }}"
-        FULL_IMAGE=$(echo $IMAGE_TAG | cut -d',' -f1)
-        IMAGE_REPO=$(echo $FULL_IMAGE | cut -d':' -f1)
-        IMAGE_VERSION=$(echo $FULL_IMAGE | cut -d':' -f2)
+        IMAGE_REPO=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        IMAGE_VERSION=${{ github.run_number }}
+        FULL_IMAGE=$IMAGE_REPO:$IMAGE_VERSION
+
+        echo "Deploying WebApp with image: $FULL_IMAGE"
+        echo "Image Repository: $IMAGE_REPO"
+        echo "Image Tag: $IMAGE_VERSION"
         
         echo "Deploying API with image: $FULL_IMAGE"
         
         # Deploy using Helm
         helm upgrade --install demo-api ./helm-repo/part_2/helm/generic-web-chart \
-          -f ./helm-repo/part_2/helm/generic-web-chart/values-api.yaml \
           --namespace gbh \
-          --create-namespace \
-          --set api.image.repository=$IMAGE_REPO \
-          --set api.image.tag=$IMAGE_VERSION \
-          --set api.image.pullPolicy=Always \
+          -- values ./helm-repo/part_2/helm/generic-web-chart/values-api.yaml \
+          --set fullnameOverride=api \
+          --set image.repository="$IMAGE_REPO" \
+          --set image.tag="$IMAGE_VERSION" \
+          --set image.pullPolicy=Always \
+          --set env.REACT_APP_API_URL="$REACT_APP_API_URL" \
           --timeout=10m \
           --wait
