@@ -105,8 +105,8 @@ jobs:
           -f ./helm-repo/part_2/helm/generic-web-chart/values-api.yaml \
           --namespace gbh \
           --create-namespace \
-          --set image.repository=$IMAGE_REPO \
-          --set image.tag=$IMAGE_VERSION \
-          --set image.pullPolicy=Always \
+          --set api.image.repository=$IMAGE_REPO \
+          --set api.image.tag=$IMAGE_VERSION \
+          --set api.image.pullPolicy=Always \
           --timeout=10m \
           --wait
