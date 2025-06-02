@@ -114,6 +114,7 @@ jobs:
         
         # Deploy using Helm
         helm upgrade --install demo-api ./helm-repo/part_2/helm/generic-web-chart \
+          -f ./helm-repo/part_2/helm/generic-web-chart/values-api.yaml \
           --namespace gbh \
           --create-namespace \
           --set api.image.repository=$IMAGE_REPO \
